@@ -10,7 +10,6 @@ def approval_program():
     handle_closeout = Return(Int(0))
     handle_updateapp = Return(Int(0))
     handle_deleteapp = Return(Int(0))
-    # globalTodo = ScratchVar(TealType.bytes)
     scratchCount = ScratchVar(TealType.uint64)
     localCount = ScratchVar(TealType.uint64)
     localTodo = ScratchVar(TealType.bytes)
@@ -19,23 +18,17 @@ def approval_program():
 
     add_local_todo = Seq([
         localTodo.store(App.localGet(Txn.sender(), Bytes("Todo"))),
-        # App.localPut(Txn.sender(), Bytes("Todo"), Concat(localTodo.load(), Txn.application_args[1])),
         App.localPut(Txn.sender(), Txn.application_args[1], Txn.application_args[2]),
-        # App.localPut(Txn.sender(), Bytes("Todo"), localTodo.load(), Txn.application_args[0]),
         Return(Int(1))
     ])
 
     complete_local_todo = Seq([
         localTodo.store(App.localGet(Txn.sender(), Bytes("Todo"))),
         scratchCount.store(App.globalGet(Bytes("Total_Complete"))),
-        # Remove Todo when its completed
         localCount.store(App.localGet(Txn.sender(), Bytes("Count"))),
         App.localPut(Txn.sender(), Bytes("Count"), localCount.load() + Int(1)),
         App.globalPut(Bytes("Total_Complete"), scratchCount.load() + Int(1)),
-        # App.localPut(Txn.sender(), Txn.application_args[1], Txn.application_args[2]),
-        # App.localPut(Txn.sender(), Bytes("Todo"), localTodo.load(), Txn.application_args[0]),
         App.localDel(Txn.sender(), Txn.application_args[1]),
-        # App.globalPut(Bytes("Total_Complete"), scratchCount.load() + Int(1)),
         Return(Int(1))
     ])
 
